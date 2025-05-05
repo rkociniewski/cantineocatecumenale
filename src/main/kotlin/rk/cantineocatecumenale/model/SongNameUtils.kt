@@ -88,11 +88,12 @@ private val siglaMap = mapOf(
 fun sanitizeFileName(title: String): String {
     // Removing diacritics (e.g. é → e)
     val normalized = Normalizer.normalize(title, Normalizer.Form.NFD)
-    val withoutDiacritics = normalized.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+    val withoutDiacritics = normalized.replace("""\p{InCombiningDiacriticalMarks}+""".toRegex(), "")
 
     // Replace illegals characters to "_"
-    val illegalChars = "[\\\\/:*?\"<>|]".toRegex()
-    val sanitized = withoutDiacritics.replace(illegalChars, "_")
+    val illegalChars = """[\\/:*?"<>|]""".toRegex()
+    val duplicateChars = """([^\p{L}\p{N}\s])\1+""".toRegex()
+    val sanitized = withoutDiacritics.replace(illegalChars, "_").replace(duplicateChars, "$1")
 
     // Replace space to "_" nad removing additional characters
     return sanitized.trim().replace("\\s+".toRegex(), "_")
