@@ -1,10 +1,13 @@
 package rk.cantineocatecumenale.model
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * User Agent for GET request.
@@ -38,14 +41,14 @@ suspend fun safeRequest(url: String, retries: Int = 3): Document? {
         } catch (e: HttpStatusException) {
             if (e.statusCode == 429 && attempt < retries - 1) {
                 val backoff = (attempt + 1) * 2000L
-                println("429 Too Many Requests. Retrying after ${backoff}ms...")
+                logger.error(e) { "429 Too Many Requests. Retrying after ${backoff}ms..." }
                 delay(backoff)
             } else {
-                println("Too many requests or failed: $url (${e.statusCode})")
+                logger.error(e) { "Too many requests or failed: $url (${e.statusCode})" }
                 return null
             }
         } catch (e: Exception) {
-            println("Request failed for $url: ${e.message}")
+            logger.error(e) { "Request failed for $url: ${e.message}" }
             return null
         }
     }

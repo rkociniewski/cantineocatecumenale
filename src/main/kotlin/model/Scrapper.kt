@@ -1,5 +1,6 @@
 package rk.cantineocatecumenale.model
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -15,6 +16,7 @@ import java.nio.file.Path
  * A web scraper for downloading Neocatechumenal songs from the cantineocatecumenale.it website.
  */
 object Scrapper {
+    private val logger = KotlinLogging.logger {}
     private const val BASE_URL = "https://www.cantineocatecumenale.it"
     private const val LIST_URL = "$BASE_URL/lista-canti/"
     private val saveDir = "${System.getProperty("user.home")}/cantineocatecumenale"
@@ -24,14 +26,14 @@ object Scrapper {
         try {
             val saveDirPath = Path.of(saveDir)
             if (Files.exists(saveDirPath)) {
-                println("Directory '$saveDir' already exists")
+                logger.info { "Directory '$saveDir' already exists" }
                 return
             }
 
             Files.createDirectories(saveDirPath)
-            println("Directory '$saveDir' created")
+            logger.info { "Directory '$saveDir' created" }
         } catch (e: IOException) {
-            println("Error creating directories: ${e.message}")
+            logger.error(e) { "Error creating directories: ${e.message}" }
         }
     }
 
@@ -69,7 +71,7 @@ object Scrapper {
         while (nextUrl != null) {
             val doc = fetchHtml(nextUrl) ?: break
             val links = parseSongLinks(doc)
-            println("Found ${links.size} songs on page: $nextUrl")
+            logger.info { "Found ${links.size} songs on page: $nextUrl" }
             allLinks.addAll(links)
             nextUrl = getNextPageUrl(doc)
         }
@@ -127,7 +129,7 @@ object Scrapper {
 
         results.forEach { (name, url) ->
             downloadMp3(name, url, saveDir)
-            println("$name => $url")
+            logger.info { "$name => $url" }
         }
 
         openFolder(saveDir)
