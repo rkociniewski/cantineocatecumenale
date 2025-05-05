@@ -78,6 +78,13 @@ private val siglaMap = mapOf(
     "Ap" to "Ap"
 )
 
+/**
+ * Sanitizes a given string to be a valid file name.
+ * Removes diacritics, illegal file characters and replaces whitespace with underscores.
+ *
+ * @param title the raw file name string
+ * @return sanitized file name
+ */
 fun sanitizeFileName(title: String): String {
     // Removing diacritics (e.g. é → e)
     val normalized = Normalizer.normalize(title, Normalizer.Form.NFD)
@@ -91,6 +98,12 @@ fun sanitizeFileName(title: String): String {
     return sanitized.trim().replace("\\s+".toRegex(), "_")
 }
 
+/**
+ * Translates Bible verse references (e.g. Mt 5,9) using a predefined abbreviation map.
+ *
+ * @param subtitle text containing potential Bible references
+ * @return subtitle with replaced Bible abbreviations
+ */
 fun translate(subtitle: String): String {
     // Regular expression to match Bible references in the subtitle:
     val regex = """\b([A-Z][a-z]{1,5})\s*(\d{1,3}(?:,\d{1,3}(?:-?\d{0,3}[a-z]?)?)?)\b""".toRegex()
@@ -103,3 +116,4 @@ fun translate(subtitle: String): String {
         "$translatedSigla $verses"
     }.trim()
 }
+

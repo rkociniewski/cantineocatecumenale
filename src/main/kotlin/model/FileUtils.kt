@@ -9,6 +9,13 @@ import java.util.Locale
 import kotlin.io.path.absolute
 import kotlin.io.path.writeBytes
 
+/**
+ * Downloads an MP3 file from the given [url] and saves it in [saveDir] with the provided [name].
+ *
+ * @param name the target file name to save the audio as
+ * @param url the full URL to the MP3 file
+ * @param saveDir the directory where the file should be saved
+ */
 fun downloadMp3(name: String, url: String?, saveDir: String) = if (url != null) {
     println("Downloading: $name")
     val audioFile = Paths.get(saveDir, name)
@@ -22,6 +29,12 @@ fun downloadMp3(name: String, url: String?, saveDir: String) = if (url != null) 
     println("No audio found for: $name")
 }
 
+/**
+ * Opens the specified [path] directory in the system's file explorer.
+ * Works for Windows, macOS, and Unix/Linux systems.
+ *
+ * @param path the directory to open
+ */
 fun openFolder(path: String) {
     val saveDir = Paths.get(path)
     if (!Files.exists(saveDir)) {

@@ -6,13 +6,31 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import kotlin.random.Random
 
+/**
+ * User Agent for GET request.
+ */
 private const val userAgent =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 
+/**
+ * Suspends the coroutine for a random delay between [minMs] and [maxMs] milliseconds.
+ * Used to simulate human-like pauses between requests to avoid rate limiting.
+ *
+ * @param minMs minimum delay in milliseconds (default 500ms)
+ * @param maxMs maximum delay in milliseconds (default 1500ms)
+ */
 suspend fun politeDelay(minMs: Long = 500, maxMs: Long = 1500) {
     delay(Random.nextLong(minMs, maxMs))
 }
 
+/**
+ * Sends a safe HTTP GET request to the given [url] using Jsoup with a specified [userAgent].
+ * Retries the request if a 429 Too Many Requests response is encountered.
+ *
+ * @param url the URL to request
+ * @param retries number of attempts before giving up (default is 3)
+ * @return a [Document] if successful, or null if all attempts fail
+ */
 suspend fun safeRequest(url: String, retries: Int = 3): Document? {
     repeat(retries) { attempt ->
         try {
