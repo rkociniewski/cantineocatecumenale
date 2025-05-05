@@ -6,6 +6,8 @@ pluginManagement {
         mavenCentral()
     }
 
+    val detektId: String by settings
+    val detektVersion: String by settings
     val dokkaId: String by settings
     val dokkaVersion: String by settings
     val kotlinId: String by settings
@@ -25,6 +27,7 @@ pluginManagement {
                 testLoggerId -> useVersion(testLoggerVersion)
                 dokkaId -> useVersion(dokkaVersion)
                 kotlinId -> useVersion(kotlinVersion)
+                detektId -> useVersion(detektVersion)
                 graalVMId -> useVersion(graalVMVersion)
             }
         }

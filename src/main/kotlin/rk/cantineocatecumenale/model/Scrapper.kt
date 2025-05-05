@@ -17,6 +17,7 @@ import java.nio.file.Path
  */
 object Scrapper {
     private val logger = KotlinLogging.logger {}
+    private const val SEMAPHORE_COUNT = 5
     private const val BASE_URL = "https://www.cantineocatecumenale.it"
     private const val LIST_URL = "$BASE_URL/lista-canti/"
     private val saveDir = "${System.getProperty("user.home")}/cantineocatecumenale"
@@ -115,7 +116,7 @@ object Scrapper {
         createDirs()
         val links = getAllSongLinks()
 
-        val semaphore = Semaphore(5)
+        val semaphore = Semaphore(SEMAPHORE_COUNT)
 
         val results = coroutineScope {
             links.map { url ->

@@ -1,3 +1,5 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 group = "rk.cantineocatecumenale"
@@ -5,6 +7,7 @@ version = "1.0.0"
 
 val javaVersion = JavaVersion.VERSION_21
 
+val detektVersion: String by project
 val jacksonVersion: String by project
 val jsoupVersion: String by project
 val kotlinLoggingVersion: String by project
@@ -15,6 +18,7 @@ val mockkVersion: String by project
 plugins {
     kotlin("jvm")
     id("com.adarshr.test-logger")
+    id("io.gitlab.arturbosch.detekt")
     id("org.jetbrains.dokka")
     id("org.graalvm.buildtools.native")
     application
@@ -25,6 +29,8 @@ repositories {
 }
 
 dependencies {
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
@@ -80,6 +86,20 @@ kotlin {
         verbose = true
         jvmTarget.set(JvmTarget.JVM_21)
     }
+}
+
+detekt {
+    source.setFrom("src/main/kotlin")
+    config.setFrom("$projectDir/detekt.yml")
+    autoCorrect = true
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = JvmTarget.JVM_21.target
+}
+
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = JvmTarget.JVM_21.target
 }
 
 testlogger {

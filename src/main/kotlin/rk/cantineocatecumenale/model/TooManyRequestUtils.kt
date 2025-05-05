@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.io.IOException
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
@@ -12,8 +13,11 @@ private val logger = KotlinLogging.logger {}
 /**
  * User Agent for GET request.
  */
-private const val userAgent =
+private const val USER_AGENT =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+
+private const val TOO_MANY_REQUEST_STATUS_CODE = 429
+private const val BACK_OFF_DELAY = 2000L
 
 /**
  * Suspends the coroutine for a random delay between [minMs] and [maxMs] milliseconds.
@@ -27,7 +31,7 @@ suspend fun politeDelay(minMs: Long = 500, maxMs: Long = 1500) {
 }
 
 /**
- * Sends a safe HTTP GET request to the given [url] using Jsoup with a specified [userAgent].
+ * Sends a safe HTTP GET request to the given [url] using Jsoup with a specified [USER_AGENT].
  * Retries the request if a 429 Too Many Requests response is encountered.
  *
  * @param url the URL to request
@@ -35,22 +39,26 @@ suspend fun politeDelay(minMs: Long = 500, maxMs: Long = 1500) {
  * @return a [Document] if successful, or null if all attempts fail
  */
 suspend fun safeRequest(url: String, retries: Int = 3): Document? {
-    repeat(retries) { attempt ->
+    var result: Document? = null
+    var attempt = 0
+
+    while (attempt < retries && result == null) {
         try {
-            return Jsoup.connect(url).userAgent(userAgent).get()
+            result = Jsoup.connect(url).userAgent(USER_AGENT).get()
         } catch (e: HttpStatusException) {
-            if (e.statusCode == 429 && attempt < retries - 1) {
-                val backoff = (attempt + 1) * 2000L
+            if (e.statusCode == TOO_MANY_REQUEST_STATUS_CODE && attempt < retries - 1) {
+                val backoff = (attempt + 1) * BACK_OFF_DELAY
                 logger.error(e) { "429 Too Many Requests. Retrying after ${backoff}ms..." }
                 delay(backoff)
             } else {
                 logger.error(e) { "Too many requests or failed: $url (${e.statusCode})" }
-                return null
             }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             logger.error(e) { "Request failed for $url: ${e.message}" }
-            return null
         }
+        attempt++
     }
-    return null
+
+    return result
 }
+
