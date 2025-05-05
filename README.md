@@ -1,6 +1,8 @@
 # Neocatechumenal Song Scraper
 
-This Kotlin-based project is a web scraper for downloading MP3 songs from the [Neocatechumenal Way songbook website](https://www.cantineocatecumenale.it). It is designed to extract, translate, and download religious songs with Bible references.
+This Kotlin-based project is a web scraper for downloading MP3 songs from
+the [Neocatechumenal Way songbook website](https://www.cantineocatecumenale.it). It is designed to extract, translate,
+and download religious songs with Bible references.
 
 ## Features
 
