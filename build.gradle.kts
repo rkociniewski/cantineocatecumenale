@@ -1,13 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 group = "rk.cantineocatecumenale"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 val javaVersion = JavaVersion.VERSION_21
 
 val jacksonVersion: String by project
 val jsoupVersion: String by project
 val kotlinLoggingVersion: String by project
+val kotlinxVersion: String by project
 val logbackVersion: String by project
 val mockkVersion: String by project
 
@@ -27,8 +28,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
     implementation("org.jsoup:jsoup:$jsoupVersion")
+
     runtimeOnly("io.github.oshai:kotlin-logging-jvm:$kotlinLoggingVersion")
+
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test-junit5"))
 }

@@ -1,58 +1,62 @@
 package rk.cantineocatecumenale.model
 
-import org.jsoup.Jsoup
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
+import org.jsoup.nodes.Document
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
-import java.util.Locale
-import kotlin.io.path.absolute
-import kotlin.io.path.writeBytes
-
 
 object Scrapper {
     private const val BASE_URL = "https://www.cantineocatecumenale.it"
     private const val LIST_URL = "$BASE_URL/lista-canti/"
     private val saveDir = "${System.getProperty("user.home")}/cantineocatecumenale"
 
-    private fun createDirs() = try {
-        Files.createDirectories(Path.of(saveDir))
-        println("Directory '$saveDir' created")
-    } catch (e: Exception) {
-        println("Error creating directories: ${e.message}")
+    private fun createDirs() {
+        try {
+            val saveDirPath = Path.of(saveDir)
+            if (Files.exists(saveDirPath)) {
+                println("Directory '$saveDir' already exists")
+                return
+            }
+
+            Files.createDirectories(saveDirPath)
+            println("Directory '$saveDir' created")
+        } catch (e: IOException) {
+            println("Error creating directories: ${e.message}")
+        }
     }
 
-    private fun getAllSongLinks(): Set<String> {
-        var nextPageUrl: String? = LIST_URL
-        val allSongsList = mutableSetOf<String>()
+    private suspend fun fetchHtml(url: String): Document? {
+        politeDelay()
+        return safeRequest(url)
+    }
 
-        while (nextPageUrl != null) {
-            try {
-                val doc = Jsoup.connect(nextPageUrl).get()
+    private fun parseSongLinks(doc: Document): List<String> =
+        doc.select("div[data-elementor-id=\"682\"] h1.elementor-heading-title a")
+            .mapNotNull { it.attr("href").trim() }
 
-                // Extracting song links from the page
-                val songLinks = doc.select("div[data-elementor-id=\"682\"] h1.elementor-heading-title a")
-                    .map { it.attr("href").trim() }
+    private fun getNextPageUrl(doc: Document): String? {
+        val next = doc.select("a.page-numbers:contains(Successivo)").firstOrNull()
+        return if (next != null && !next.hasClass("disabled")) next.attr("href") else null
+    }
 
-                println("Found ${songLinks.size} songs on page: $nextPageUrl")
+    private suspend fun getAllSongLinks(): List<String> {
+        val allLinks = mutableListOf<String>()
+        var nextUrl: String? = LIST_URL
 
-                allSongsList.addAll(songLinks)
-
-                // Checking if button "Successivo >>" exists and is activate
-                val nextPageElement = doc.select("a.page-numbers:contains(Successivo)").firstOrNull()
-                nextPageUrl = if (nextPageElement != null && !nextPageElement.hasClass("disabled")) {
-                    nextPageElement.attr("href")
-                } else {
-                    null // No more pages
-                }
-            } catch (e: Exception) {
-                println("Error loading page $nextPageUrl: ${e.message}")
-                break
-            }
+        while (nextUrl != null) {
+            val doc = fetchHtml(nextUrl) ?: break
+            val links = parseSongLinks(doc)
+            println("Found ${links.size} songs on page: $nextUrl")
+            allLinks.addAll(links)
+            nextUrl = getNextPageUrl(doc)
         }
-
-        return allSongsList
+        return allLinks
     }
 
     private fun processTitle(title: String, subTitle: String): String {
@@ -65,65 +69,38 @@ object Scrapper {
         return sanitizeFileName("$title | $translatedSubTitle").trim().replace(Regex("_+"), "_") + ".mp3"
     }
 
-    private fun createNameUrlSongs(songs: Set<String>) = songs.associate { songUrl ->
-        val songDoc = Jsoup.connect(songUrl).get()
+    private suspend fun fetchSongTitleAndUrl(songUrl: String): Pair<String, String>? {
+        val doc = fetchHtml(songUrl) ?: return null
 
-        val titleElement = songDoc.select("div[data-id=\"4e9b0b4\"] h1").firstOrNull()
-        val subtitleElement = songDoc.select("div[data-id=\"4e9b0b4\"] h5").firstOrNull { it.text().contains("Cfr.") }
+        val title = doc.select("div[data-id=\"4e9b0b4\"] h1").firstOrNull()?.text()?.trim() ?: "Unknown Title"
+        val subtitle = doc.select("div[data-id=\"4e9b0b4\"] h5")
+            .firstOrNull { it.text().contains("Cfr.") }?.text()?.trim() ?: ""
 
-        val title = titleElement?.text()?.trim() ?: "Unknown Title"
-        val subtitle = subtitleElement?.text()?.trim() ?: ""
-
-        val processedTitle = processTitle(title, subtitle)
-
-        val audioElement = songDoc.select("audio source[type=audio/mpeg]").firstOrNull()
-            ?: songDoc.select("audio source[type=audio/wav]").firstOrNull()
-        val audioUrl = audioElement?.attr("src")
-        processedTitle to audioUrl
+        val fileName = processTitle(title, subtitle)
+        return Pair(fileName, songUrl)
     }
 
-    private fun downloadMp3(nameUrlSongs: Map<String, String?>) = nameUrlSongs.forEach { (name, url) ->
-        if (url != null) {
-            val audioFile = Paths.get(saveDir, name)
-
-            audioFile.writeBytes(
-                Jsoup.connect(url).ignoreContentType(true).execute().bodyAsBytes(),
-                StandardOpenOption.CREATE
-            )
-            println("Downloaded: ${audioFile.absolute()}")
-        } else {
-            println("No audio found for: $name")
-        }
-    }
-
-    private fun openFolder(path: String) {
-        val saveDir = Paths.get(path)
-        if (!Files.exists(saveDir)) {
-            println("Directory doesn't exist: $saveDir")
-            return
-        }
-
-        try {
-            val os = System.getProperty("os.name").lowercase(Locale.getDefault())
-
-            when {
-                os.contains("win") -> Runtime.getRuntime().exec(arrayOf("explorer", path))
-                os.contains("mac") -> Runtime.getRuntime().exec(arrayOf("open", path))
-                os.contains("nix") || os.contains("nux") -> Runtime.getRuntime().exec(arrayOf("xdg-open", path))
-                else -> println("Unsupported OS: $os")
-            }
-        } catch (e: IOException) {
-            println("Error during opening directory: ${e.message}")
-        }
-    }
-
-    fun scrap() {
+    fun run() = runBlocking {
         createDirs()
+        val links = getAllSongLinks()
 
-        val allSongsList = getAllSongLinks()
-        println("Found ${allSongsList.size} unique songs")
-        val nameUrlSongs = createNameUrlSongs(allSongsList)
-        downloadMp3(nameUrlSongs)
+        val semaphore = Semaphore(5)
+
+        val results = coroutineScope {
+            links.map { url ->
+                async {
+                    semaphore.withPermit {
+                        fetchSongTitleAndUrl(url)
+                    }
+                }
+            }.awaitAll().filterNotNull().toMap()
+        }
+
+        results.forEach { (name, url) ->
+                downloadMp3(name, url, saveDir)
+                println("$name => $url")
+        }
+
         openFolder(saveDir)
     }
 }
