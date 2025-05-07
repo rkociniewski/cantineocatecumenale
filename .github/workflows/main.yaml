@@ -18,5 +18,8 @@ jobs:
                     distribution: 'temurin'
                     java-version: '21'
 
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
             -   name: Final build and lint
                 run: ./gradlew clean build detekt
