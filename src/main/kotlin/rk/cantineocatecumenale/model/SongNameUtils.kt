@@ -86,18 +86,29 @@ private val siglaMap = mapOf(
  * @return sanitized file name
  */
 fun sanitizeFileName(title: String): String {
-    // Removing diacritics (e.g. é → e)
+    // Normalize and remove diacritics (e.g. ł → l, é → e)
     val normalized = Normalizer.normalize(title, Normalizer.Form.NFD)
-    val withoutDiacritics = normalized.replace("""\p{InCombiningDiacriticalMarks}+""".toRegex(), "")
+    val withoutDiacritics = normalized.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
+        .replace('ł', 'l').replace('Ł', 'L') // manual fix for Polish ł
 
-    // Replace illegals characters to "_"
-    val illegalChars = """[\\/:*?"<>|]""".toRegex()
-    val duplicateChars = """([^\p{L}\p{N}\s])\1+""".toRegex()
-    val sanitized = withoutDiacritics.replace(illegalChars, "_").replace(duplicateChars, "$1")
+    // Replace illegal filename characters with underscore
+    val illegalChars = "[\\\\/:*?\"<>|]".toRegex()
+    val sanitized = withoutDiacritics.replace(illegalChars, "_")
 
-    // Replace space to "_" nad removing additional characters
-    return sanitized.trim().replace("\\s+".toRegex(), "_")
+    // Replace commas with underscores (for verse ranges: 5,1 → 5_1)
+    val withCommasHandled = sanitized.replace(",", "_")
+
+    // Collapse duplicate non-alphanum symbols (e.g. ____)
+    val duplicateChars = """([^\p{L}\p{N}])\1+""".toRegex()
+    val deduplicated = withCommasHandled.replace(duplicateChars, "$1")
+
+    // Replace multiple whitespaces with underscore
+    val spaced = deduplicated.replace("\\s+".toRegex(), "_")
+
+    // Remove trailing or leading underscores and dots
+    return spaced.trim('_', '.')
 }
+
 
 /**
  * Translates Bible verse references (e.g. Mt 5,9) using a predefined abbreviation map.

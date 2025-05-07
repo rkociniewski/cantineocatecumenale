@@ -38,6 +38,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
     implementation("org.jsoup:jsoup:$jsoupVersion")
 
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlinxVersion}")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation(kotlin("test-junit5"))
 }
@@ -52,6 +53,7 @@ application {
 }
 
 tasks.test {
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
     useJUnitPlatform()
 }
 

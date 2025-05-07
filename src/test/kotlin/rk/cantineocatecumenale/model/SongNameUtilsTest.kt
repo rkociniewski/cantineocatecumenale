@@ -22,7 +22,7 @@ class SongNameUtilsTest {
     @Test
     fun `sanitizeFileName should remove diacritics and special characters`() {
         val input = "Zażółć gęślą jaźń.mp3"
-        val expected = "Zazołc_gesla_jazn.mp3"
+        val expected = "Zazolc_gesla_jazn.mp3"
         assertEquals(expected, sanitizeFileName(input))
     }
 

@@ -8,6 +8,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.jsoup.nodes.Document
+import rk.cantineocatecumenale.util.downloadMp3
+import rk.cantineocatecumenale.util.fetchHtml
+import rk.cantineocatecumenale.util.openFolder
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -36,15 +39,6 @@ object Scrapper {
         } catch (e: IOException) {
             logger.error(e) { "Error creating directories: ${e.message}" }
         }
-    }
-
-    /** Loads and parses the HTML from a URL with delay and retries.
-     * @param url link to be loaded
-     * @return [Document] of page
-     */
-    internal suspend fun fetchHtml(url: String): Document? {
-        politeDelay()
-        return safeRequest(url)
     }
 
     /** Extracts links to individual songs from the page document.
@@ -87,9 +81,10 @@ object Scrapper {
      */
     internal fun processTitle(title: String, subTitle: String): String {
         val translatedSubTitle = if (subTitle.isNotEmpty()) {
-            val cleanedSubTitle =
-                subTitle.replace("Cfr. ", "").substringBeforeLast(" - ").replace(",", "")
-                    .replace("\\s*\\(\\d{1,3}\\)\\s*".toRegex(), "")
+            val cleanedSubTitle = subTitle
+                .replace("Cfr. ", "")
+                .substringBeforeLast(" - ")
+                .replace("\\s*\\(\\d{1,3}\\)\\s*".toRegex(), "")
             translate(cleanedSubTitle)
         } else ""
         return sanitizeFileName("$title | $translatedSubTitle").trim().replace(Regex("_+"), "_") + ".mp3"

@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.cantineocatecumenale.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jsoup.Jsoup
