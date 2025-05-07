@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.cantineocatecumenale.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jsoup.Jsoup
@@ -32,6 +32,8 @@ fun downloadMp3(name: String, url: String?, saveDir: String) = if (url != null) 
     logger.warn { "No audio found for: $name" }
 }
 
+internal fun detectOs(): String = System.getProperty("os.name").lowercase(Locale.getDefault())
+
 /**
  * Opens the specified [path] directory in the system's file explorer.
  * Works for Windows, macOS, and Unix/Linux systems.
@@ -41,22 +43,23 @@ fun downloadMp3(name: String, url: String?, saveDir: String) = if (url != null) 
 fun openFolder(path: String) {
     val saveDir = Paths.get(path)
     if (!Files.exists(saveDir)) {
-        logger.warn { "Directory doesn't exist: $saveDir" }
+        println("Directory doesn't exist: $saveDir")
         return
     }
 
     try {
-        val os = System.getProperty("os.name").lowercase(Locale.getDefault())
+        val os = detectOs()
 
         when {
             os.contains("win") -> Runtime.getRuntime().exec(arrayOf("explorer", path))
             os.contains("mac") -> Runtime.getRuntime().exec(arrayOf("open", path))
             os.contains("nix") || os.contains("nux") -> Runtime.getRuntime().exec(arrayOf("xdg-open", path))
-            else -> logger.warn { ("Unsupported OS: $os") }
+            else -> println("Unsupported OS: $os")
         }
 
-        logger.info { "Opening directory: $path" }
+        println("Opening directory: $path")
     } catch (e: IOException) {
-        logger.error(e) { "Error during opening directory: ${e.message}" }
+        println("Error during opening directory: ${e.message}")
     }
 }
+

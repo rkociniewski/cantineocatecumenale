@@ -8,6 +8,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.jsoup.nodes.Document
+import rk.cantineocatecumenale.util.downloadMp3
+import rk.cantineocatecumenale.util.fetchHtml
+import rk.cantineocatecumenale.util.openFolder
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -23,7 +26,7 @@ object Scrapper {
     private val saveDir = "${System.getProperty("user.home")}/cantineocatecumenale"
 
     /** Adds a random delay to avoid being rate-limited. */
-    private fun createDirs() {
+    internal fun createDirs() {
         try {
             val saveDirPath = Path.of(saveDir)
             if (Files.exists(saveDirPath)) {
@@ -38,20 +41,11 @@ object Scrapper {
         }
     }
 
-    /** Loads and parses the HTML from a URL with delay and retries.
-     * @param url link to be loaded
-     * @return [Document] of page
-     */
-    private suspend fun fetchHtml(url: String): Document? {
-        politeDelay()
-        return safeRequest(url)
-    }
-
     /** Extracts links to individual songs from the page document.
      * @param doc page where a link is searching for.
      * @return song links
      */
-    private fun parseSongLinks(doc: Document): List<String> =
+    internal fun parseSongLinks(doc: Document): List<String> =
         doc.select("div[data-elementor-id=\"682\"] h1.elementor-heading-title a")
             .mapNotNull { it.attr("href").trim() }
 
@@ -59,13 +53,13 @@ object Scrapper {
      * @param doc page where a link is searching for.
      * @return next page link
      */
-    private fun getNextPageUrl(doc: Document): String? {
+    internal fun getNextPageUrl(doc: Document): String? {
         val next = doc.select("a.page-numbers:contains(Successivo)").firstOrNull()
         return if (next != null && !next.hasClass("disabled")) next.attr("href") else null
     }
 
     /** Crawls through paginated song list pages to gather all song URLs. */
-    private suspend fun getAllSongLinks(): List<String> {
+    internal suspend fun getAllSongLinks(): List<String> {
         val allLinks = mutableListOf<String>()
         var nextUrl: String? = LIST_URL
 
@@ -85,11 +79,12 @@ object Scrapper {
      * @param subTitle subtitle of this song, mostly Bible sigla
      * @return safe file name
      */
-    private fun processTitle(title: String, subTitle: String): String {
+    internal fun processTitle(title: String, subTitle: String): String {
         val translatedSubTitle = if (subTitle.isNotEmpty()) {
-            val cleanedSubTitle =
-                subTitle.replace("Cfr. ", "").substringBeforeLast(" - ").replace(",", "")
-                    .replace("\\s*\\(\\d{1,3}\\)\\s*".toRegex(), "")
+            val cleanedSubTitle = subTitle
+                .replace("Cfr. ", "")
+                .substringBeforeLast(" - ")
+                .replace("\\s*\\(\\d{1,3}\\)\\s*".toRegex(), "")
             translate(cleanedSubTitle)
         } else ""
         return sanitizeFileName("$title | $translatedSubTitle").trim().replace(Regex("_+"), "_") + ".mp3"
@@ -100,7 +95,7 @@ object Scrapper {
      * @param songUrl audio URL from the song detail page
      * @return [Pair] of song title and audio URL
      */
-    private suspend fun fetchSongTitleAndUrl(songUrl: String): Pair<String, String>? {
+    internal suspend fun fetchSongTitleAndUrl(songUrl: String): Pair<String, String>? {
         val doc = fetchHtml(songUrl) ?: return null
 
         val title = doc.select("div[data-id=\"4e9b0b4\"] h1").firstOrNull()?.text()?.trim() ?: "Unknown Title"
