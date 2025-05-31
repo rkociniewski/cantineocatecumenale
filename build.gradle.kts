@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -7,40 +8,17 @@ version = "1.0.0"
 
 val javaVersion = JavaVersion.VERSION_21
 
-val detektVersion: String by project
-val jacksonVersion: String by project
-val jsoupVersion: String by project
-val kotlinLoggingVersion: String by project
-val kotlinxVersion: String by project
-val logbackVersion: String by project
-val mockkVersion: String by project
-
 plugins {
-    kotlin("jvm")
-    id("com.adarshr.test-logger")
-    id("io.gitlab.arturbosch.detekt")
-    id("org.jetbrains.dokka")
-    id("org.graalvm.buildtools.native")
-    application
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.test.logger)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.manes)
+    alias(libs.plugins.detekt)
 }
+
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detektVersion")
-
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("io.github.oshai:kotlin-logging-jvm:$kotlinLoggingVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
-    implementation("org.jsoup:jsoup:$jsoupVersion")
-
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlinxVersion}")
-    testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation(kotlin("test-junit5"))
 }
 
 java {
@@ -48,8 +26,28 @@ java {
     targetCompatibility = javaVersion
 }
 
-application {
-    mainClass.set("rk.cantineocatecumenale.MainKt")
+dependencies {
+    detektPlugins(libs.detekt)
+
+    implementation(libs.jackson.module)
+    implementation(libs.jackson.datatype)
+
+    implementation(libs.logback)
+    implementation(libs.kotlin.logging)
+
+    implementation(libs.kotlinx.core)
+    implementation(libs.jsoup)
+
+    testImplementation(libs.kotlinx.test)
+    testImplementation(libs.mockk)
+    testImplementation(kotlin("test-junit5"))
+}
+testlogger {
+    showStackTraces = false
+    showFullStackTraces = false
+    showCauses = false
+    slowThreshold = 10000
+    showSimpleNames = true
 }
 
 tasks.test {
@@ -57,36 +55,28 @@ tasks.test {
     useJUnitPlatform()
 }
 
-graalvmNative {
-    binaries {
-        named("main") {
-            javaLauncher.set(javaToolchains.launcherFor {
-                languageVersion.set(JavaLanguageVersion.of(javaVersion.toString()))
-                vendor.set(JvmVendorSpec.GRAAL_VM)
-            })
-
-            buildArgs.addAll(
-                listOf("--enable-url-protocols=http,https")
-            )
-        }
-    }
-}
-
 tasks.dokkaHtml {
-    outputDirectory.set(layout.buildDirectory.dir("dokka"))
+    outputDirectory.set(layout.buildDirectory.dir("dokka")) // output directory of dokka documentation.
+    // source set configuration.
     dokkaSourceSets {
-        named("main") {
-            jdkVersion.set(21)
-            skipDeprecated.set(false)
-            includeNonPublic.set(true)
+        named("main") { // source set name.
+            jdkVersion.set(java.targetCompatibility.toString().toInt()) // Used for linking to JDK documentation
+            skipDeprecated.set(false) // Add output to deprecated members. Applies globally can be overridden by packageOptions
+            includeNonPublic.set(true) // non-public modifiers should be documented
         }
     }
 }
 
 kotlin {
     compilerOptions {
-        verbose = true
-        jvmTarget.set(JvmTarget.JVM_21)
+        verbose = true // enable verbose logging output
+        jvmTarget.set(JvmTarget.fromTarget(java.targetCompatibility.toString())) // target version of the generated JVM bytecode
+    }
+}
+
+tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
+    rejectVersionIf {
+        isNonStable(candidate.version) && !isNonStable(currentVersion)
     }
 }
 
@@ -104,8 +94,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = JvmTarget.JVM_21.target
 }
 
-testlogger {
-    showStackTraces = false
-    slowThreshold = 10000
-    showSimpleNames = true
+private fun isNonStable(version: String): Boolean {
+    return listOf("alpha", "beta", "rc", "cr", "m", "preview", "snapshot", "dev")
+        .any { version.lowercase().contains(it) }
 }
