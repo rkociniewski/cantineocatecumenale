@@ -16,7 +16,6 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-
 repositories {
     mavenCentral()
 }

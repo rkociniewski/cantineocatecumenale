@@ -1,5 +1,13 @@
 # Neocatechumenal Song Scraper
 
+[![version](https://img.shields.io/badge/version-1.0.0-yellow.svg)](https://semver.org)
+[![Awesome Kotlin Badge](https://kotlin.link/awesome-kotlin.svg)](https://github.com/KotlinBy/awesome-kotlin)
+[![Build](https://github.com/rkociniewski/cantineocatecumenale/actions/workflows/main.yml/badge.svg)](https://github.com/rkociniewski/cantineocatecumenale/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/rkociniewski/cantineocatecumenale/branch/main/graph/badge.svg)](https://codecov.io/gh/rkociniewski/cantineocatecumenale)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.21-blueviolet?logo=kotlin)](https://kotlinlang.org/)
+[![Gradle](https://img.shields.io/badge/Gradle-8.14.1-blue?logo=gradle)](https://gradle.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-greem.svg)](https://opensource.org/licenses/MIT)
+
 This Kotlin-based project is a web scraper for downloading MP3 songs from
 the [Neocatechumenal Way songbook website](https://www.cantineocatecumenale.it). It is designed to extract, translate,
 and download religious songs with Bible references.
@@ -16,7 +24,7 @@ and download religious songs with Bible references.
 
 ## Technologies Used
 
-- Kotlin 1.9+
+- Kotlin 2.1.21
 - kotlinx.coroutines
 - Jsoup
 - Kotlin Logging (`kotlin-logging-jvm`)
@@ -46,8 +54,16 @@ and download religious songs with Bible references.
 
 ## License
 
-This project is intended for private, non-commercial use. Please respect the content rights of the original source.
+This project is licensed under the MIT License.
 
-## Disclaimer
+## Built With
 
-This tool is provided as-is. The target site may change its structure or implement stronger anti-bot protections.
+* [Gradle](https://gradle.org/) - Dependency Management
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning.
+
+## Authors
+
+* **Rafał Kociniewski** - [PowerMilk](https://github.com/rkociniewski)
