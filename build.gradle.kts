@@ -1,4 +1,3 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -12,7 +11,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.test.logger)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.manes)
     alias(libs.plugins.detekt)
 }
 
@@ -60,7 +58,7 @@ tasks.dokkaHtml {
     dokkaSourceSets {
         named("main") { // source set name.
             jdkVersion.set(java.targetCompatibility.toString().toInt()) // Used for linking to JDK documentation
-            skipDeprecated.set(false) // Add output to deprecated members. Applies globally can be overridden by packageOptions
+            skipDeprecated.set(false)
             includeNonPublic.set(true) // non-public modifiers should be documented
         }
     }
@@ -69,13 +67,7 @@ tasks.dokkaHtml {
 kotlin {
     compilerOptions {
         verbose = true // enable verbose logging output
-        jvmTarget.set(JvmTarget.fromTarget(java.targetCompatibility.toString())) // target version of the generated JVM bytecode
-    }
-}
-
-tasks.named<DependencyUpdatesTask>("dependencyUpdates") {
-    rejectVersionIf {
-        isNonStable(candidate.version) && !isNonStable(currentVersion)
+        jvmTarget.set(JvmTarget.fromTarget(java.targetCompatibility.toString()))
     }
 }
 
@@ -91,9 +83,4 @@ tasks.withType<Detekt>().configureEach {
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = JvmTarget.JVM_21.target
-}
-
-private fun isNonStable(version: String): Boolean {
-    return listOf("alpha", "beta", "rc", "cr", "m", "preview", "snapshot", "dev")
-        .any { version.lowercase().contains(it) }
 }

@@ -1,15 +1,14 @@
 [versions]
-kotlin = "2.1.21"
+kotlin = "2.2.10"
 kotlinx = "1.10.2"
-jackson = "2.19.0"
+jackson = "2.19.2"
 logback = "1.5.18"
-kotlin-logging = "7.0.7"
-mockk = "1.14.2"
+kotlin-logging = "7.0.13"
+mockk = "1.14.5"
 test-logger = "4.0.0"
 dokka = "2.0.0"
-manes = "0.52.0"
 detekt = "1.23.8"
-jsoup = "1.20.1"
+jsoup = "1.21.1"
 graalvm = "0.10.6"
 
 [libraries]
@@ -34,6 +33,5 @@ version.ref = "kotlin"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 test-logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-manes = { id = "com.github.ben-manes.versions", version.ref = "manes" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 graalvm-native = { id = "org.graalvm.buildtools.native", version.ref = "graalvm" }
