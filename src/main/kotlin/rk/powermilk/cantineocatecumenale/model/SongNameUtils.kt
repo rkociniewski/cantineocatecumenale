@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.powermilk.cantineocatecumenale.model
 
 import java.text.Normalizer
 

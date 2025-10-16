@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.util
+package rk.powermilk.cantineocatecumenale.util
 
 import org.jsoup.nodes.Document
 import rk.cantineocatecumenale.model.politeDelay

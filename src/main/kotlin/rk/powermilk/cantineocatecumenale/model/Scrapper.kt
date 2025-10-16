@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.powermilk.cantineocatecumenale.model
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.async
@@ -8,9 +8,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.jsoup.nodes.Document
-import rk.cantineocatecumenale.util.downloadMp3
-import rk.cantineocatecumenale.util.fetchHtml
-import rk.cantineocatecumenale.util.openFolder
+import rk.powermilk.cantineocatecumenale.util.downloadMp3
+import rk.powermilk.cantineocatecumenale.util.fetchHtml
+import rk.powermilk.cantineocatecumenale.util.openFolder
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

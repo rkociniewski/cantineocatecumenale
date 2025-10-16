@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.util
+package rk.powermilk.cantineocatecumenale.util
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jsoup.Jsoup

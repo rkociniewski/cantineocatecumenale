@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.powermilk.cantineocatecumenale.model
 
 import org.jsoup.Jsoup
 import rk.cantineocatecumenale.model.Scrapper.getNextPageUrl

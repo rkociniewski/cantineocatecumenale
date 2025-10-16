@@ -1,4 +1,4 @@
-package rk.cantineocatecumenale.model
+package rk.powermilk.cantineocatecumenale.model
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
