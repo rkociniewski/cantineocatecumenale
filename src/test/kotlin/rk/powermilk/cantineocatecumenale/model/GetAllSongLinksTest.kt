@@ -4,8 +4,8 @@ import io.mockk.coEvery
 import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
-import rk.cantineocatecumenale.model.Scrapper.getAllSongLinks
-import rk.cantineocatecumenale.util.fetchHtml
+import rk.powermilk.cantineocatecumenale.model.Scrapper.getAllSongLinks
+import rk.powermilk.cantineocatecumenale.util.fetchHtml
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

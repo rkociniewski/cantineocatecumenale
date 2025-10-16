@@ -8,8 +8,8 @@ import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import rk.cantineocatecumenale.util.detectOs
-import rk.cantineocatecumenale.util.openFolder
+import rk.powermilk.cantineocatecumenale.util.detectOs
+import rk.powermilk.cantineocatecumenale.util.openFolder
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,7 +21,7 @@ class OpenFolderTest {
 
     @BeforeEach
     fun setup() {
-        mockkStatic("rk.cantineocatecumenale.util.FileUtilsKt")
+        mockkStatic("rk.powermilk.cantineocatecumenale.util.FileUtilsKt")
         mockkStatic(Runtime::class)
         Files.createDirectories(Path.of(testDir))
     }

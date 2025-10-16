@@ -6,8 +6,8 @@ import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import rk.cantineocatecumenale.model.Scrapper.fetchSongTitleAndUrl
-import rk.cantineocatecumenale.util.fetchHtml
+import rk.powermilk.cantineocatecumenale.model.Scrapper.fetchSongTitleAndUrl
+import rk.powermilk.cantineocatecumenale.util.fetchHtml
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

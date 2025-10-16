@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockkStatic
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import rk.cantineocatecumenale.util.downloadMp3
+import rk.powermilk.cantineocatecumenale.util.downloadMp3
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.readBytes

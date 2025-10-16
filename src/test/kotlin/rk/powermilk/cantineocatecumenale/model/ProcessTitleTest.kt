@@ -2,7 +2,7 @@ package rk.powermilk.cantineocatecumenale.model
 
 import io.mockk.every
 import io.mockk.mockkStatic
-import rk.cantineocatecumenale.model.Scrapper.processTitle
+import rk.powermilk.cantineocatecumenale.model.Scrapper.processTitle
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

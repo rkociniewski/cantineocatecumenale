@@ -1,7 +1,7 @@
 package rk.powermilk.cantineocatecumenale.model
 
 import org.jsoup.Jsoup
-import rk.cantineocatecumenale.model.Scrapper.getNextPageUrl
+import rk.powermilk.cantineocatecumenale.model.Scrapper.getNextPageUrl
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
