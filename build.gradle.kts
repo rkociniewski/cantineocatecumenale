@@ -11,7 +11,7 @@ group = "rk.powermilk"
 /**
  * project version
  */
-version = "1.1.8"
+version = "1.1.9"
 
 val javaVersion: JavaVersion = JavaVersion.VERSION_21
 val jvmTargetVersion = JvmTarget.JVM_21.target
