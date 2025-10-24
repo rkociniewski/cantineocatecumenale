@@ -11,10 +11,10 @@ group = "rk.powermilk"
 /**
  * project version
  */
-version = "1.1.10"
+version = "1.1.11"
 
 val javaVersion: JavaVersion = JavaVersion.VERSION_21
-val jvmTargetVersion = JvmTarget.JVM_21.target
+val jvmTargetVersion = JvmTarget.JVM_21
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -32,7 +32,6 @@ java {
     targetCompatibility = javaVersion
 }
 
-// dependencies
 dependencies {
     detektPlugins(libs.detekt)
     implementation(libs.jackson.kotlin)
@@ -44,13 +43,13 @@ dependencies {
     testImplementation(libs.kotlinx.test)
     testImplementation(libs.mockk)
     testImplementation(libs.junit.params)
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
 }
 
 kotlin {
     compilerOptions {
-        verbose = true // enable verbose logging output
-        jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion)) // target version of the generated JVM bytecode
+        verbose = true
+        jvmTarget.set(jvmTargetVersion)
     }
 }
 
@@ -62,7 +61,7 @@ detekt {
 
 dokka {
     dokkaSourceSets.main {
-        jdkVersion.set(java.targetCompatibility.toString().toInt()) // Used for linking to JDK documentation
+        jdkVersion.set(javaVersion.toString().toInt())
         skipDeprecated.set(false)
     }
 
@@ -133,9 +132,9 @@ tasks.register("coverage") {
 }
 
 tasks.withType<Detekt>().configureEach {
-    jvmTarget = jvmTargetVersion
+    jvmTarget = jvmTargetVersion.target
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = jvmTargetVersion
+    jvmTarget = jvmTargetVersion.target
 }
