@@ -1,3 +1,5 @@
+rootProject.name = "cantineocatecumenale"
+
 pluginManagement {
     repositories {
         google()
@@ -6,4 +8,3 @@ pluginManagement {
         mavenCentral()
     }
 }
-rootProject.name = "cantineocatecumenale"
