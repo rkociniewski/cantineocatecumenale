@@ -37,11 +37,11 @@ class OpenFolderTest {
 
         every { detectOs() } returns "windows"
         every { Runtime.getRuntime() } returns runtimeMock
-        every { runtimeMock.exec(arrayOf("explorer", testDir)) } returns mockk()
+        every { runtimeMock.exec(arrayOf("C:\\Windows\\explorer.exe", testDir)) } returns mockk()
 
         openFolder(testDir)
 
-        verify { runtimeMock.exec(arrayOf("explorer", testDir)) }
+        verify { runtimeMock.exec(arrayOf("C:\\Windows\\explorer.exe", testDir)) }
     }
 
     @Test

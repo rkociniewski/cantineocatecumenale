@@ -51,9 +51,9 @@ fun openFolder(path: String) {
         val os = detectOs()
 
         when {
-            os.contains("win") -> Runtime.getRuntime().exec(arrayOf("explorer", path))
-            os.contains("mac") -> Runtime.getRuntime().exec(arrayOf("open", path))
-            os.contains("nix") || os.contains("nux") -> Runtime.getRuntime().exec(arrayOf("xdg-open", path))
+            os.contains("win") -> Runtime.getRuntime().exec(arrayOf("C:\\Windows\\explorer.exe", path))
+            os.contains("mac") -> Runtime.getRuntime().exec(arrayOf("/usr/bin/open", path))
+            os.contains("nix") || os.contains("nux") -> Runtime.getRuntime().exec(arrayOf("/usr/bin/xdg-open", path))
             else -> println("Unsupported OS: $os")
         }
 
